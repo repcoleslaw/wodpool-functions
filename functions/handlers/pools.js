@@ -52,11 +52,8 @@ exports.joinPool = (req, resp) => {
 
   const competitorDocument = db.collection('competitors').where('userHandle', '==', req.user.handle)
   .where('poolId', '==', req.params.poolID).limit(1);
-
   const poolDocument = db.doc(`/pools/${req.params.poolID}`);
-  
   let poolData;
-  
   poolDocument.get()
   .then(doc => {
     //check the pool exists
@@ -98,6 +95,37 @@ exports.joinPool = (req, resp) => {
     resp.status(500).json({error: 'Something went wrong'});
   });
 };
+
+///updated pool join
+
+exports.joinPoolv2 = (req, resp) => {
+  const board = db.collection(`/pools/${req.params.poolID}/board`)
+
+  const newCompetitor = {
+    userHandle: req.user.handle,
+    joinedAt: new Date().toISOString(),
+    prevScore:'',
+    currentScore:'',
+    hasPaid:'false'
+  }
+  
+  board.get()
+  .then(data => {
+    console.log(data);
+    let board = [];
+    data.forEach(doc => {
+      board.push({
+        user: doc.id,
+        ...doc.data()
+      });
+    });
+    return resp.json(board);
+  })
+  .catch(err => {
+    console.error(err);
+    resp.status(404).json({error: 'Pool not found'})
+  })
+}
 
 /// ADMIN POOL STUFF
 

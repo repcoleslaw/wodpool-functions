@@ -3,6 +3,10 @@ const {db} = require('./util/admin');
 
 const app = require('express')(); 
 
+
+
+
+
 const fbAuth = require('./util/fbAuth');
 const cors = require('cors');
 app.use(cors());
@@ -20,9 +24,14 @@ const {
   getPools, 
   getPool, 
   joinPool, 
+  joinPoolv2, 
   createExercise, 
   createPool, 
   getExercises } = require('./handlers/pools');
+
+  const {
+    checkout
+  } = require('./handlers/checkout');
 
 
 //Comment Routes
@@ -38,7 +47,8 @@ app.post('/admin/pools/exercise', fbAuth, createExercise)
 //Pool Routes
 app.get('/pools', getPools);
 app.get('/pools/:poolID', fbAuth, getPool);
-app.get('/pools/:poolID/join', fbAuth, joinPool);
+// app.get('/pools/:poolID/join', fbAuth, joinPool);
+app.get('/pools/:poolID/board', fbAuth, joinPoolv2);
 //TODO: Get: Authorized Pool Workout
 //TODO: Post: Authorized Workout Score
 
@@ -51,6 +61,10 @@ app.get('/user', fbAuth, getAuthenticatedUser);
 // app.get('/user/pools', fbAuth, myPools);
 
 // post request for poolPublishing ('/admin, fbAuth, publishPool)
+
+// checkout sessions
+app.post('/create-checkout-session', checkout); 
+
 
 exports.api = functions.https.onRequest(app);
 
